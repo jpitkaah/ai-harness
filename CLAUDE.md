@@ -125,7 +125,10 @@ no format, memory, stops or checks, server's default sampling, RAW_MAX_TOKENS 20
    another is left out; (2) if too long, the model shortens sentences one at a time, longest first (kept only if
    nothing is lost); (3) code drops whole sentences: one of a similar pair (the topic one, else the shorter), then
    topics, then the oldest. `prompt_history` puts it in front as one more exchange ("What do you remember from our
-   earlier conversation?"), one sentence per line (a trace: 12/16 vs 10/16 as one block), so every route shows it. Test: `python memory_test.py jack|long|heldout|fresh`
+   earlier conversation?"), one sentence per line (a trace: 12/16 vs 10/16 as one block), so every route shows it.
+   The user's message is always saved; a reply that was looked up or rejected is saved as None and its
+   message shown only as a "You also said: ..." line in that exchange (2026-10-12, trace c53c73: a name was
+   lost; saving "Okay." as the reply instead was copied by 13/26 answers). `memory_test.py unkept`. Test: `python memory_test.py jack|long|heldout|fresh`
    (scripted conversations, ~25 s each; plan.md has every step). Latest: fresh 14/17, heldout 13/17 - all four have
    been tuned on by now (fresh least). Left: facts in the summary the answer still ignores ("beekeeper" -> hobby
    "read and write"), facts the notes miss, and a changed fact next to the old one (Bristol/Leeds). Tried and failed: FAILED_EXPERIMENTS.md "Memory summary".

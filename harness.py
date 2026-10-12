@@ -103,6 +103,11 @@ MEMORY_SIZE = 10
 COMPACT_BATCH = 5
 SUMMARY_LIMIT = 200
 MEMORY_FILE = Path(__file__).parent / "memory.json"
+# A reply that isn't kept (looked up, or every attempt rejected) is saved as None: YOUR message is still
+# remembered (2026-10-12: "My name is Jack Jackson. What is yours?" went to the source chain, its reply wasn't
+# saved, and the name was lost with it). Prompts show such a message only as a "You also said:" line in the
+# memory exchange - never as an exchange with a reply. A neutral "Okay." as the reply was copied: with 4 in
+# memory, 13 of 26 general answers were just "Okay." (memory_test.py unkept).
 TOKENIZE_URL = "http://127.0.0.1:8090/tokenize"  # llama.cpp's own tokenizer: exact token counts
 
 # Logging: every attempt (accepted or rejected) becomes one JSON line in
@@ -174,10 +179,12 @@ def prompt_history(memory):
     """The exchanges a prompt shows: the summary (if any), then the last MEMORY_SIZE exchanges.
     The summary is shown one sentence per line (2026-10-12 trace, same summary and 16 questions: one block
     10/16, one per line 12/16 - "How old am I?" and the football team were answered from it only then)."""
-    shown = memory["exchanges"][-MEMORY_SIZE:]
-    if memory["summary"]:
-        lines = "\n".join(split_sentences(memory["summary"]))
-        shown = [{"user": SUMMARY_QUESTION, "ai": lines, "summary": True}] + shown
+    recent = memory["exchanges"][-MEMORY_SIZE:]
+    shown = [e for e in recent if e["ai"] is not None]
+    # Messages whose reply wasn't kept: in the memory exchange, so there is no reply to copy.
+    lines = split_sentences(memory["summary"]) + [f"You also said: {e['user']}" for e in recent if e["ai"] is None]
+    if lines:
+        shown = [{"user": SUMMARY_QUESTION, "ai": "\n".join(lines), "summary": True}] + shown
     return shown
 
 
@@ -270,14 +277,17 @@ def compact_memory(summary, exchanges):
        fact already says (most of its words) is left out;
     2. if too long, the model shortens sentences, longest first (each kept only if nothing is lost);
     3. if still too long, code drops whole sentences: one of two similar ones, then topics, then the oldest."""
-    conversation = "\n".join(f"User: {e['user']}\nAI: {e['ai']}" for e in exchanges)
+    def said(e, sep):  # an exchange as text; one whose reply wasn't kept (None) is only the user's message
+        return f"User: {e['user']}" + (f"{sep}AI: {e['ai']}" if e["ai"] is not None else "")
+
+    conversation = "\n".join(said(e, "\n") for e in exchanges)
     # Notes are one line; a longer n-gram for the repetition check, as notes rightly repeat
     # phrases like "You have a" (the normal 4 would stop them early).
     # Grounding check (2026-10-12): the notes copied the prompt's sample ("the capital of Japan, and how
     # many people live there") in 3 of 6 compactions. A note sentence must come from what it summarises.
     notes, kept, facts = [], [], []
     for k, e in enumerate(exchanges):
-        before = f"User: {exchanges[k - 1]['user']} / AI: {exchanges[k - 1]['ai']}" if k else "(nothing)"
+        before = said(exchanges[k - 1], " / ") if k else "(nothing)"
         fact, _, _ = generate(FACT_PROMPT.format(before=before, message=e["user"]), soft_limit=60,
                               hard_limit=60, temperature=0, repeat_ngram=8)
         fact = fact.strip()
@@ -1072,24 +1082,22 @@ if __name__ == "__main__":
                          # what it returned (titles, text) and what the model answered from it.
                          "chain": chain,
                          "sources": [{"url": url, "chars": len(text), "text": text} for url, text in used_sources]})
-            # Not saved to memory. A saved "18°" became a pattern: later weather questions
-            # WITHOUT a search got invented temperatures (11/12). Marking it in memory
-            # ("18° (from a web search: accuweather.com)") was worse: invented 12/12, and
-            # the fake answers copied the marker. Tested 2026-10-09.
-            continue
-        if USE_BEST_STRATEGY:
+        elif USE_BEST_STRATEGY:
             # best_strat doesn't report single attempts, so one log line per message.
             log_attempt({"id": answer_id, "prompt": prompt, "attempt": 1, "response": reply or "",
                          "accepted": reply is not None,
                          "reason": f"best_strat ({attempts} attempts)" if reply else "gave up (best_strat)",
                          "stopped_by": "best_strat", "tokens": None, "shown_unchecked": unchecked})
-        if reply is not None:
-            # Only accepted replies are remembered; a rejected one would teach
-            # the model its own mistakes.
-            # When memory is full, the model folds the oldest exchanges into the summary (a few seconds).
-            old_summary = memory["summary"]
-            with Spinner("updating memory"):
-                memory = save_memory(add_exchange(memory, {"user": prompt, "ai": reply}))
-            history = prompt_history(memory)
-            if memory["summary"] != old_summary:
-                print(style(f"   memory summary: {memory['summary']}", "dim"))
+        # Your message is always remembered; the reply only if it was accepted and not looked up.
+        # A rejected reply would teach the model its own mistakes. A looked-up one: a saved "18°" became a
+        # pattern - later weather questions WITHOUT a search got invented temperatures (11/12); marking it
+        # ("18° (from a web search: ...)") was worse, 12/12, the fakes copied the marker (2026-10-09).
+        # Otherwise the reply is saved as None (see prompt_history).
+        kept_reply = reply if reply is not None and not looked_up else None
+        # When memory is full, the model folds the oldest exchanges into the summary (a few seconds).
+        old_summary = memory["summary"]
+        with Spinner("updating memory"):
+            memory = save_memory(add_exchange(memory, {"user": prompt, "ai": kept_reply}))
+        history = prompt_history(memory)
+        if memory["summary"] != old_summary:
+            print(style(f"   memory summary: {memory['summary']}", "dim"))

@@ -390,6 +390,10 @@ None beat the baseline.
   questions with memory present 20 -> 19/22 in both - memory wasn't hurting them. Scores overlap ("What do bees make?"
   0.58, "What am I cooking tonight?" 0.34). Switched off (strat2.MEMORY_GATE). Not tried: a gate shown the memory.
 
+- **"Okay." saved as the reply that wasn't kept** (2026-10-12, so the user's message stays in memory): with 4 such
+  exchanges in memory, 13 of 26 general answers were just "Okay." (general 9/22, without memory 19) - the same marker
+  copying as 2026-10-09. Now the reply is None and the message is shown as a "You also said:" line (0/26 copies).
+
 ## Ruled out on principle (not tested)
 - Detecting "answer with one word / only a number / yes or no" in the question and trimming the
   reply in code. Hard-coded task rules defeat the purpose: the model must figure it out itself.

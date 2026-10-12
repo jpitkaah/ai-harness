@@ -356,10 +356,47 @@ def poison_test():
               f"{copies}/{len(OPEN)}\n")
 
 
+# Unkept replies (2026-10-12): a looked-up or rejected reply isn't saved, but the user's message is (reply None),
+# shown as a "You also said:" line. Here 4 in a row (the realistic worst case: several look-ups), one with the
+# name, after two normal exchanges. (A first version saved "Okay." as the reply: 13 of 26 answers became "Okay.")
+UNKEPT = [{"user": "What is a meme?", "ai": "A meme is a popular saying or idea that spreads quickly among people."},
+          {"user": "What is an AI?", "ai": "An artificial intelligence."}] + [{"user": u, "ai": None} for u in (
+    "Who is the president of Finland?", "What's the weather like in Oslo?",
+    "My name is Jack Jackson. What is yours?", "Who won the 2024 Tour de France?")]
+
+
+def unkept_test():
+    """Is the name in an unkept exchange remembered (asked the app's way: look-up decision, then the source
+    chain or the strategy)? Do general answers copy the memory lines?"""
+    import sources
+    strat2.MEMORY_GATE = False
+    history = harness.prompt_history({"summary": "", "exchanges": UNKEPT})
+    question = "Do you remember what my name is?"
+    if sources.needs_lookup(question):
+        reply, _, _, _ = sources.answer(question, history)
+        path = "source chain"
+    else:
+        reply, _ = strat2.answer(history, question)
+        path = "strategy"
+    ok = reply is not None and is_correct(reply, ["jack"], None)
+    print(f"{'ok  ' if ok else 'MISS'} [{path}] {question}\n       -> {reply}\n")
+    right = ask(history, GENERAL, show_all=False)
+    copies = 0
+    for q in OPEN + [q for q, _, _, _ in GENERAL]:
+        r, _ = strat2.answer(history, q)
+        if r is not None and ("also said" in r.lower() or any(e["user"].lower() in r.lower() for e in UNKEPT)):
+            copies += 1
+            print(f"COPY {q} -> {r}")
+    print(f"\nname remembered: {ok}; general {right}/{len(GENERAL)} (no memory: 19); replies copying the memory "
+          f"lines: {copies}/{len(OPEN) + len(GENERAL)}")
+
+
 def main():
     args = sys.argv[1:]
     if args == ["poison"]:
         return poison_test()
+    if args == ["unkept"]:
+        return unkept_test()
     compare_gate = "--gate" in args
     names = [a for a in args if a != "--gate"] or list(CONVERSATIONS)
     for name in names:

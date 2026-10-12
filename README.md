@@ -138,9 +138,10 @@ and longer requests loop or repeat words. `/raw` hides and shows the column.
 **Memory:** the app remembers the last **10 exchanges** in `memory.json`, plus a short
 summary of everything older that the model writes itself (at most 200 tokens). Whenever the
 summary changes, the app prints it as a dim `memory summary:` line, so you can see what it
-kept. Only accepted replies are saved: if every attempt fails the checks, the app still shows
-the last one, marked "unchecked" with the reason, but doesn't save it. Looked-up answers are
-not saved either.
+kept. Your message is always saved, but the reply only if it passed the checks and wasn't looked up
+(a saved looked-up fact once became a pattern the model copied). If every attempt fails the
+checks, the app still shows the last one, marked "unchecked" with the reason. A message whose
+reply wasn't kept appears in memory as "You also said: ...", so your name or facts in it aren't lost.
 
 The app answers with the best strategy (**v20b**, `best_strat.py`). Every message is logged
 to `logs/YYYY-MM-DD.jsonl`; `python stats.py` summarises the logs.
@@ -172,7 +173,8 @@ How to read it: start at the memory. If the fact isn't there, the answer never h
 chance; look at the earlier answer that should have saved it. If it is there, go down the
 calls to the first one that went wrong. Example: for `c53c73` ("Do you remember what my
 name is?" -> "You haven't told me yet.") the memory held only "What is an AI?" - the
-message with the name had been sent to the source chain, whose answers aren't saved.
+message with the name had been sent to the source chain, and back then a looked-up answer
+wasn't saved at all, your message included. (Fixed: your message is now always kept.)
 
 ### Test 1: our own eval (`eval.py`)
 

@@ -1017,3 +1017,24 @@ with the bug too. The runner now also logs the single unrotated read, for a same
 Picks rotated A 44, B 49, C 55, D 50 (single: A 59, B 53, C 78, D 8; right: 48, 51, 47, 52). Against the Oct-10
 generated run: only new 24, only old 25; against the bare model: 26 vs 28. Removing the letter bias spreads the
 guesses evenly but doesn't make them better - the model mostly doesn't know these answers.
+
+### Your message is always kept in memory (2026-10-12, user's OK; trace c53c73)
+Found with view.py: "My name is Jack Jackson. What is yours?" scored 0.20 on "public sources know?", went to the source
+chain (Wikipedia: Jack Jackson, ice hockey player), and since looked-up answers aren't saved, the name was lost;
+"Do you remember what my name is?" then found only "What is an AI?" in memory. Now the user's message is always saved;
+a reply that is looked up or rejected is saved as harness.UNKEPT_REPLY ("Okay.").
+Test: `python memory_test.py unkept` - memory of 4 unkept exchanges (one with the name), the name question asked the
+app's way, then the held-out eval's 22 general questions + 4 open requests with that memory.
+**Prediction:** name remembered (the chain's memory stage reads the user's words). General 18-20/22 (no memory: 19);
+0-2 replies that are just "Okay." - a marker was copied once (2026-10-09), but this one carries no fact to copy.
+**Result of the "Okay." version: name remembered, but 13/26 general answers were just "Okay." (general 9/22, no memory
+19) - the marker was copied. Replaced:** an unkept exchange is saved with reply None, and prompt_history shows its
+message only as a "You also said: ..." line in the memory exchange - no reply to copy.
+**Prediction (2nd run, `python memory_test.py unkept`):** name remembered; general 18-20/22; 0-1 copies.
+**2nd run: 0/26 copies, general 18/22 - but the name was NOT found** ("I don't remember your name; you haven't told
+me."): the chain's memory step read the lines as "Notes from the earlier conversation: You also said: My name is Jack
+Jackson..." and its evidence step said NONE. sources.memory_text now reads "You also said:" lines as the user's own
+messages ("The user said: ... My name is Jack Jackson. What is yours? ..."). Only the name question is affected, so only
+it is rechecked (the copy/general part ran on the same prompts and doesn't use memory_text).
+**Result: name found** - "Do you remember what my name is?" -> source chain -> "Yes, my name is Jack Jackson." (right
+fact, the reply says "my" for "your"). Kept: the user's message is always remembered; copies 0/26, general 18/22.

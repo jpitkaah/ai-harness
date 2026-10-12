@@ -432,10 +432,16 @@ def memory_text(history):
     is the president of Finland" (2026-10-09, in the app) would be read back as evidence and
     stop every later look-up. The user's messages hold the facts about them ("I live in Helsinki").
     The memory summary (harness.prompt_history, 2026-10-12) holds the older facts, written to the user.
+    Its "You also said: ..." lines are the user's own messages whose reply wasn't kept: read as such
+    (as "Notes ...: You also said: My name is Jack Jackson." the evidence step found no name).
     """
-    notes = [f"Notes from the earlier conversation: {e['ai']}" for e in history if e.get("summary")]
-    said = [exchange["user"] for exchange in history if not exchange.get("summary")]
-    parts = notes + (["The user said: " + " ".join(said)] if said else [])
+    lines = [line for e in history if e.get("summary") for line in e["ai"].splitlines()]
+    also = "You also said: "
+    notes = [line for line in lines if not line.startswith(also)]
+    said = [line[len(also):] for line in lines if line.startswith(also)]
+    said += [exchange["user"] for exchange in history if not exchange.get("summary")]
+    parts = (["Notes from the earlier conversation: " + " ".join(notes)] if notes else []) + \
+            (["The user said: " + " ".join(said)] if said else [])
     return " ".join(parts) if parts else None
 
 
