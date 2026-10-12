@@ -106,6 +106,10 @@ Leave the instruct model alone for now.
   harness = best_strat without search. Run the IFBench scorer
   with PYTHONUTF8=1 (the runner does). Keep GPQA questions local (its authors ask that).
 
+## The app's raw column (2026-10-12, user's request)
+Next to every answer the app prints the bare base model's completion of the message as typed (`raw_completion`:
+no format, memory, stops or checks, server's default sampling, RAW_MAX_TOKENS 200), side by side; `/raw` toggles.
+
 ## What the harness does (harness.py)
 1. **Generation limits** — streams tokens and stops itself (never sends `max_tokens`): on EOS
    (`finish_reason: "stop"`), at the first sentence end after `SOFT_LIMIT` (50), always at

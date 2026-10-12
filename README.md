@@ -130,6 +130,11 @@ app shows which source answered and its URLs; if not, the best strategy answers 
 `/search` turns search off and on again. `/clear` empties the memory; an empty line or Ctrl+C
 quits (Ctrl+C while it works cancels that answer).
 
+**The raw column:** next to every answer the app shows what the bare base model writes for the same
+message - your message exactly as typed, one plain completion: no chat format, no memory, no checks,
+only a 200-token cap. That's where you see what the harness is for: "hello" becomes a page of C++ code,
+and longer requests loop or repeat words. `/raw` hides and shows the column.
+
 **Memory:** the app remembers the last **10 exchanges** in `memory.json`, plus a short
 summary of everything older that the model writes itself (at most 200 tokens). Whenever the
 summary changes, the app prints it as a dim `memory summary:` line, so you can see what it
@@ -140,12 +145,34 @@ not saved either.
 The app answers with the best strategy (**v20b**, `best_strat.py`). Every message is logged
 to `logs/YYYY-MM-DD.jsonl`; `python stats.py` summarises the logs.
 
-**Troubleshooting one answer:** every answer gets a short id, printed under it (`id 9007ad`).
-`python view.py 9007ad` opens a page in your browser with everything behind that answer:
-the route, the source chain (texts, evidence, the vote), memory, and every model call in
-order with its full prompt and output. `python view.py` lists the recent ids. The traces
-are saved in `traces/`. To chat with the plain harness (base A) instead,
-set `USE_BEST_STRATEGY = False` at the bottom of `harness.py`.
+To chat with the plain harness (base A) instead, set `USE_BEST_STRATEGY = False` at the bottom
+of `harness.py`.
+
+### Why did it answer that? (`view.py`)
+
+Every answer gets a short id, printed under it in dim text (`id c53c73`). The app saves
+everything behind that answer in `traces/<id>.json`, and `view.py` turns it into a page:
+
+```powershell
+python view.py           # lists the most recent answers: id, time, your message
+python view.py c53c73    # opens that answer's page in your browser
+```
+
+The page shows, from top to bottom:
+
+1. **Your message, the reply** and whether it was looked up (and from which source).
+2. **The source chain**, if it ran: what had to be found, each source's text and the
+   evidence taken from it, and the vote.
+3. **The memory** the answer saw (the summary and the last exchanges).
+4. **Every model call in order**: each yes/no decision with its probabilities (that's how a
+   route or a look-up was chosen), and each generation with its full prompt and output,
+   followed by the checks and why a reply was rejected.
+
+How to read it: start at the memory. If the fact isn't there, the answer never had a
+chance; look at the earlier answer that should have saved it. If it is there, go down the
+calls to the first one that went wrong. Example: for `c53c73` ("Do you remember what my
+name is?" -> "You haven't told me yet.") the memory held only "What is an AI?" - the
+message with the name had been sent to the source chain, whose answers aren't saved.
 
 ### Test 1: our own eval (`eval.py`)
 

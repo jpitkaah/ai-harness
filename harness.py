@@ -44,7 +44,9 @@ import math
 import os
 import re
 import secrets
+import shutil
 import sys
+import textwrap
 import threading
 import urllib.request
 from datetime import datetime
@@ -871,6 +873,39 @@ class Spinner:
             sys.stdout.flush()
 
 
+# The raw column (2026-10-12, user's request): next to every answer the app shows what the bare base model
+# writes for the same message - the message exactly as typed, one plain completion: no chat format, no memory,
+# no stop sequences, no checks, the server's own sampling settings. Only a token cap, or a loop would never end.
+# It shows what the harness is for: the repetition and word spam of a base model left alone.
+RAW_MAX_TOKENS = 200
+
+
+def raw_completion(prompt):
+    """The bare base model's continuation of `prompt` (nothing added), cut off hard at RAW_MAX_TOKENS tokens -
+    mid-sentence if that's where it is. Returns (text, cut): cut is True if the cap stopped it, not the model."""
+    body = json.dumps({"model": MODEL, "prompt": prompt, "max_tokens": RAW_MAX_TOKENS}).encode("utf-8")
+    request = urllib.request.Request(SERVER_URL, data=body, headers={"Content-Type": "application/json"})
+    with urllib.request.urlopen(request) as response:
+        choice = json.loads(response.read())["choices"][0]
+    return choice["text"], choice.get("finish_reason") == "length"
+
+
+def print_side_by_side(left_title, left, right_title, right):
+    """Two texts in two columns, each wrapped to half the terminal width."""
+    width = max(20, (shutil.get_terminal_size().columns - 3) // 2)
+
+    def lines(text):
+        out = []
+        for line in text.strip().splitlines() or [""]:
+            out += textwrap.wrap(line, width) or [""]
+        return out
+
+    print(style(left_title.ljust(width), "bold", "cyan") + " │ " + style(right_title, "bold", "yellow"))
+    print(" " * width + " │")
+    for a, b in itertools.zip_longest(lines(left), lines(right), fillvalue=""):
+        print(f"{a.ljust(width)} │ {b}")
+
+
 STYLES = {"dim": "2", "bold": "1", "cyan": "36", "green": "32", "yellow": "33", "red": "31"}
 
 
@@ -916,7 +951,8 @@ if __name__ == "__main__":
           + ("best strategy" if USE_BEST_STRATEGY else "plain harness"), "dim"))
     print(style(f"memory: {count} exchange{'' if count == 1 else 's'}"
                 + (" + summary" if memory["summary"] else "") + "  ·  /search turns search on/off  ·  "
-                "/clear empties memory  ·  empty line quits", "dim"))
+                "/raw hides/shows the raw model  ·  /clear empties memory  ·  empty line quits", "dim"))
+    show_raw = True  # the raw base model's answer next to the harness's (/raw toggles)
 
     while True:
         label = style("search on", "green") if search_on else style("search off", "dim")
@@ -938,8 +974,12 @@ if __name__ == "__main__":
                 search_on = not search_on
                 print(style(f"Search is now {'on' if search_on else 'off'}.", "dim"))
             continue
+        if prompt == "/raw":
+            show_raw = not show_raw
+            print(style(f"The raw model's column is now {'on' if show_raw else 'off'}.", "dim"))
+            continue
         if prompt.startswith("/"):
-            print(style("Commands: /search (on/off), /clear. Anything else is a message.", "yellow"))
+            print(style("Commands: /search (on/off), /raw (on/off), /clear. Anything else is a message.", "yellow"))
             continue
 
         looked_up = False
@@ -979,7 +1019,21 @@ if __name__ == "__main__":
         # marked as unchecked. It is NOT saved to memory (below: only `reply` is): rejected echoes in
         # memory once made later answers echo too ("capital of France?" -> "The capital of France.").
         unchecked = harness.last_rejected.get("reply") if reply is None else None
-        if USE_BEST_STRATEGY or looked_up:
+        raw = None
+        if show_raw and (USE_BEST_STRATEGY or looked_up):
+            try:
+                with Spinner("asking the raw model"):
+                    raw, cut = raw_completion(prompt)
+                if cut:
+                    raw += f"\n\n[cut off here: the {RAW_MAX_TOKENS}-token limit]"
+            except (KeyboardInterrupt, OSError) as error:
+                raw = f"(no raw answer: {error or 'cancelled'})"
+            shown = reply if reply is not None else unchecked or f"(gave up after {attempts} attempts)"
+            print_side_by_side("Harness:", shown, "Raw base model, no harness:", raw)
+            if unchecked:
+                print(style(f"   unchecked: all {attempts} attempts failed the checks (last: "
+                            f"{harness.last_rejected['reason']}) · not saved to memory", "yellow"))
+        elif USE_BEST_STRATEGY or looked_up:
             if reply is not None:
                 print(f"{style('AI', 'bold', 'cyan')} {style('›', 'cyan')} {reply}")
             elif unchecked:
@@ -1005,7 +1059,7 @@ if __name__ == "__main__":
                                "unchecked_reason": harness.last_rejected.get("reason") if unchecked else None,
                                "attempts": attempts, "answered_from": used,
                                "sources": [{"url": url, "text": text} for url, text in used_sources],
-                               "chain": chain, "memory": history}, harness.trace)
+                               "chain": chain, "memory": history, "raw": raw}, harness.trace)
         harness.trace = None
         print(style(f"   id {answer_id}", "dim"))
 
