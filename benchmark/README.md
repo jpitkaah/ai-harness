@@ -11,6 +11,8 @@ without the harness. Results go to `results/`.
 ## Setup (once)
 
 ```powershell
+# IFBench: its prompts and its own scorer (not in this repo's git - cloned here).
+git clone https://github.com/allenai/IFBench benchmark\IFBench
 # IFBench's scorer needs a few packages (spaCy, NLTK, ...), in the Python the project uses:
 python -m pip install -r benchmark\IFBench\requirements.txt
 ```
