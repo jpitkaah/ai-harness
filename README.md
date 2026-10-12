@@ -2,11 +2,11 @@
 
 ## Lyhyesti mallista
 
-Harness on rakennettu Qwen2.5-3B-mallin **base**-version ympärille (julkaistu 2024). Base-mallia ei ole koulutettu keskustelemaan: se vain jatkaa tekstiä. Pienenä (3 miljardia parametria) ja ilman chat-koulutusta se on heikko lähtökohta: ilman harnessia se toistaa itseään, toistaa käyttäjän sanoja ja keksii vastauksia. Valitsin mallin juuri siksi: jos jokin malli hyötyy harnessista, niin se on tämä.
+Harness on rakennettu Qwen2.5-3B-mallin **base**-version ympärille (julkaistu 2024). Base-mallia ei ole koulutettu keskustelemaan: se vain jatkaa tekstiä. Pienenä (3 miljardia parametria) ja ilman chat-koulutusta se on heikko lähtökohta: ilman harnessia se toistaa itseään, toistaa käyttäjän sanoja ja keksii vastauksia. Valitsin mallin juuri sen yksinkertaisen luonteensa vuoksi. Jos jokin malli hyötyy harnessista, niin se on tämä.
 
-Harnessin avulla mallista tuli melko luotettava chat-ohjelma. Kysymyksillä, joihin harnessia ei ole viritetty, tulos nousee 18/26:sta 22/26:een, eniten ohjeiden noudattamisessa ja muistissa. Julkisissa testeissä (GPQA, IFBench) se on samalla tasolla kuin pelkkä malli: harness ei voi lisätä tietoa, jota mallilla ei ole.
+Harnessin avulla mallista tuli melko luotettava chat-ohjelma. Kysymyksillä (joihin harnessia ei ole suoraan viritetty) tulos nousee 18/26:sta 22/26:een, eniten ohjeiden noudattamisessa ja muistissa. Julkisissa testeissä (GPQA, IFBench) se on vain hieman korkeamma kuin pelkkä base-malli. Tämä johtuu siitä, että harness ei voi lisätä tietoa, jota sillä ei ole.
 
-Entä valmis ammattilaisharness, kuten opencode? Samoilla kysymyksillä ja samalla mallilla se sai noin 14/26, vähemmän kuin pelkkä malli. Se on tehty instruct-malleille, jotka noudattavat ohjeita ja käyttävät työkaluja. Base-malli ei osaa kumpaakaan, joten vastaukset venyivät roskaksi ja kaikki ohjekysymykset epäonnistuivat.
+Entä valmis ammattitason harness, kuten opencode? Samoilla kysymyksillä ja samalla mallilla se sai noin 14/26, vähemmän kuin pelkkä malli. Se on tehty kehittyneille sekä instruct-malleille, jotka noudattavat ohjeita ja käyttävät työkaluja. Base-malli ei osaa kumpaakaan, joten vastaukset venyivät roskaksi ja kaikki ohjekysymykset epäonnistuivat.
 
 ## Lyhyesti arkkitehtuurista
 
