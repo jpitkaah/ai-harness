@@ -1051,3 +1051,20 @@ on 2026-10-10, with sampled answers).
 which writes what has to be found, worded it differently this time, and the evidence step then copied the name. So
 3e2cb3 was a borderline case, not a sure miss. On the exact failing input (same need) only one per line found the name
 (the probe above), so the new format is the safer one; nothing got worse. The Jack reply now says "your name".
+
+### For fun: opencode (a professional coding agent) on the held-out eval (2026-10-12)
+opencode v2.0.27, `opencode run` per question, the same base model via llama-server's chat endpoint (opencode's own
+system prompt and tools, its default sampling). Memory questions: the earlier conversation written into the message
+(opencode takes one message per run). Scored with eval.py's is_correct. Script in the scratchpad (one-off).
+Smoke tests: "capital of Australia?" -> "I am ready to help."; "14 times 16?" -> "<assistant>" + "======" x ~4000 tokens.
+**Prediction:** about 3-8/26 - below the bare model (base raw 18/26) and far below strat2 (22/26): opencode's long
+coding-agent prompt is written for an instruct model with tool calls, and the base model rambles on it.
+**Result: 16/26 by the scorer, really 14-15** (facts 6/8, math 4/6, trick 3/4, instructions 0/4, memory 3/4; ~10 min).
+Two "ok"s are keyword luck: the sheep reply says "17 + 9 = 26 sheep" (the 9 matched), and "What is my job?" printed no
+"nurse" in its first 200 characters (the reply rewrote the conversation; the keyword was likely in the copy). So the
+prediction (3-8) was too low: short facts mostly came out right. But 8 replies ran on to the 4096-token output limit
+with junk ("======", "----", "^assistant", an imgur link, "And again."), every instruction failed ("True." for the
+Moon), and one reply was "{{"response": <response-json-object>}}" - the agent prompt's formats leaking. Not
+deterministic (opencode samples): "14 times 16" spammed "======" in the smoke test, was right in the run.
+Compared with the same questions: base model no harness 18/26, strat2 22/26 - opencode is below both, mainly on
+instructions (strat2 3/4) and the junk the model writes after its answer (opencode has nothing to stop it).

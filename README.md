@@ -6,6 +6,8 @@ Harness on rakennettu Qwen2.5-3B-mallin **base**-version ympärille (julkaistu 2
 
 Harnessin avulla mallista tuli melko luotettava chat-ohjelma. Kysymyksillä, joihin harnessia ei ole viritetty, tulos nousee 18/26:sta 22/26:een, eniten ohjeiden noudattamisessa ja muistissa. Julkisissa testeissä (GPQA, IFBench) se on samalla tasolla kuin pelkkä malli: harness ei voi lisätä tietoa, jota mallilla ei ole.
 
+Entä valmis ammattilaisharness, kuten opencode? Samoilla kysymyksillä ja samalla mallilla se sai noin 14/26, vähemmän kuin pelkkä malli. Se on tehty instruct-malleille, jotka noudattavat ohjeita ja käyttävät työkaluja. Base-malli ei osaa kumpaakaan, joten vastaukset venyivät roskaksi ja kaikki ohjekysymykset epäonnistuivat.
+
 ## Lyhyesti arkkitehtuurista
 
 Jokainen viesti kulkee näiden vaiheiden läpi:
@@ -19,6 +21,7 @@ Jokainen viesti kulkee näiden vaiheiden läpi:
 
 ## Mitä Seuraavaksi
 
+Muisti ja Web Search -työkalujen päivittäminen ja benchmarkkaaminen.
 
 
 ## In English
@@ -298,6 +301,17 @@ request before), on the base model Qwen2.5-3B (Q4_K_M).
 | Base model, no harness | 18 / 26 | 7 | **6** | 3 | 1 | 1 |
 | Base A (plain harness) | 18 / 26 | | | | | |
 | **v20b** (best strategy) | **22 / 26** | **8** | 5 | 3 | **3** | **3** |
+| opencode v2.0.27 (for fun) | 16 / 26 (really ~14) | 6 | 4 | 3 | 0 | 3 |
+
+*Isn't it easier to just use a professional harness like [opencode](https://opencode.ai)?* Not
+with this model. We ran the same 26 questions through `opencode run` on the same base model (the
+earlier conversation written into the message; scored the same way, but opencode samples, so it
+isn't deterministic). Two of its 16 were keyword luck ("17 + 9 = 26 sheep" contains the 9).
+opencode is a coding agent written for instruct models that follow instructions and call tools,
+and a base model does neither. 8 replies ran on to the 4096-token limit with junk
+("======", "^assistant", "And again. And again..."), every instruction failed ("True." to
+"the Moon is a planet"), and its own prompt leaked into answers ("Use the globe tool to search
+for the Earth..."). A small harness built for the model it runs on does better here.
 
 On the original, fitted set the best strategy scored 74 of 78 (each question asked three
 times, about 25/26): the gap to 22 is what fitting to those questions was worth.
