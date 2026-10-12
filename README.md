@@ -14,6 +14,12 @@ Jokainen viesti kulkee näiden vaiheiden läpi:
 2. **Tarvitaanko hakua?** Malli vastaa kyllä/ei-kysymykseen, ja vastaus luetaan todennäköisyytenä (token-luottamus). Esimerkiksi "Who is the current president of Finland?" saa 0,62, joten se haetaan: mallin oma tieto on vanhentunutta. Haku etenee järjestyksessä: oma muisti -> sää (wttr.in) -> Wikipedia ja Grokipedia -> verkkohaku (1-5 sivua). Jokaisesta lähteestä poimitaan vain kysymykseen vastaava kohta. Jokainen lähde saa yhden äänen, ja myös mallin oma vastaus (jota ei näytetä käyttäjälle, esim. "Sauli Niinistö") saa yhden. Vähintään kaksi samaa sanovaa ääntä voittaa.
 3. **Reititys.** Jos hakua ei tarvita, malli valitsee kyllä/ei-kysymyksillä reitin: pitkä teksti, kirjainten laskeminen, vertailu, laskutoimitus tai muu. Vaikea kysymys pilkotaan pieniin erillisiin vaiheisiin, joista jokainen näkee vain tarvitsemansa. Esimerkiksi "kilo höyheniä vai kilo terästä?" -kysymyksessä verrataan pelkkiä määriä, jottei tuttu arvoitus johda harhaan. Tekniikan nimi on reititys ja tehtävän pilkkominen (prompt chaining).
 4. **Vastaus ja tarkistukset.** Vastaus pysäytetään lauseen loppuun noin 50 tokenin jälkeen ja viimeistään 100 tokenissa (pitkät tekstit enintään 1500). Jokainen vastaus tarkistetaan: ei tyhjä, ei pelkkä käyttäjän sanojen toisto, ei silmukkaa, ei kielen vaihtoa, ei aiemman vastauksen kopio, ja mallin oma kyllä/ei: liittyykö vastaus viestiin. Hylätty vastaus generoidaan uudelleen (enintään 3 yritystä), ja uusi yritys saa huomautuksen siitä, mikä edellisessä oli vialla. Raaka base-malli jää helposti toistamaan itseään, joten tämä on harnessin tärkein osa.
+5. **Kielitarkistus.** Qwen on kiinalainen malli, ja sen base-versio vaihtaa helposti kiinaan kesken vastauksen (kokeessa 6 vastausta 30:stä). Jos vastauksessa on kiinalaisia, japanilaisia tai korealaisia merkkejä (tai ranskaa), mutta viestissä ei ole, vastaus hylätään ja uusi yritys saa ohjeen vastata käyttäjän kielellä. Tämä tarkistus tehdään koodilla, ei mallilla: kun mallia pyydettiin arvioimaan myös kieli, se hylkäsi kaikki vastaukset.
+
+
+## Mitä Seuraavaksi
+
+
 
 ## In English
 
@@ -85,20 +91,48 @@ Search (on by default in the app) needs two more things. Wikipedia, Grokipedia a
 need no setup, but SearXNG must be running: without it, a question that reaches the web
 stage shows "Look-up failed ... Is SearXNG running?" instead of an answer.
 
-```powershell
-# trafilatura: downloads a web page and extracts its main text.
-pip install -r requirements.txt
+**1. trafilatura** (downloads a web page and extracts its main text):
 
-# SearXNG's settings: copy the template and put any long random string in secret_key
+```powershell
+pip install -r requirements.txt
+```
+
+**2. Docker Desktop** (once). SearXNG runs in Docker. On Windows:
+
+```powershell
+winget install -e --id Docker.DockerDesktop
+```
+
+(Or download it from <https://www.docker.com/products/docker-desktop/>, also for macOS; on Linux,
+Docker Engine is enough.) Start Docker Desktop and wait until it says "Engine running". Check:
+
+```powershell
+docker version      # shows a "Server" part once the engine is running
+```
+
+**3. SearXNG** (once). There is nothing to build: SearXNG publishes a ready image, so you only
+download it, copy the settings, and create the container.
+
+```powershell
+# Download the image (docker run below would also do this the first time).
+docker pull searxng/searxng
+
+# Settings: copy the template and put any long random string in secret_key
 # (searxng/settings.yml itself is not in git, because it holds that key).
 copy searxng\settings.example.yml searxng\settings.yml
 
-# SearXNG: a local meta search engine, run in Docker (Docker Desktop must be running).
-# ONE-TIME setup: this creates the container. Afterwards start it with `docker start searxng`
-# (running this line again fails: "The container name "/searxng" is already in use").
-# Port 8888 on this machine only (127.0.0.1: not reachable from your network, since the
-# limiter is off); 8080 is the container's own internal port.
+# Create and start the container, in the project folder. ONE TIME only: running it again fails
+# ("The container name "/searxng" is already in use"). Port 8888 on this machine only
+# (127.0.0.1: not reachable from your network, since the limiter is off); 8080 is the
+# container's own internal port; -v gives it the settings folder.
 docker run -d --name searxng -p 127.0.0.1:8888:8080 -v "${PWD}\searxng:/etc/searxng" searxng/searxng
+```
+
+**4. Every time after that** (for example after a restart): start Docker Desktop, then
+
+```powershell
+docker start searxng
+docker ps           # searxng should be listed as "Up"
 ```
 
 The settings switch on SearXNG's JSON output, which the code needs, enable extra engines,

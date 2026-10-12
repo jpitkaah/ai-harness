@@ -46,8 +46,8 @@ import re
 import secrets
 import shutil
 import sys
-import textwrap
 import threading
+import unicodedata
 import urllib.request
 from datetime import datetime
 from pathlib import Path
@@ -900,20 +900,57 @@ def raw_completion(prompt):
     return choice["text"], choice.get("finish_reason") == "length"
 
 
+def cells(ch):
+    """How many terminal columns a character takes: 2 for Chinese/Japanese/Korean and full-width forms."""
+    return 2 if unicodedata.east_asian_width(ch) in "WF" else 1
+
+
+def wrap_columns(line, width):
+    """Word-wrap a line to `width` terminal columns; a word wider than that is split."""
+    out, current = [], ""
+    for word in line.split():
+        while sum(map(cells, word)) > width:  # too wide for any line: fill this one, split the rest
+            room = width - sum(map(cells, current)) - (1 if current else 0)
+            head, used = "", 0
+            for ch in word:
+                if used + cells(ch) > room:
+                    break
+                head += ch
+                used += cells(ch)
+            if head:
+                out.append(f"{current} {head}".strip())
+                word = word[len(head):]
+            else:
+                out.append(current)
+            current = ""
+        if current and sum(map(cells, f"{current} {word}")) > width:
+            out.append(current)
+            current = word
+        else:
+            current = f"{current} {word}".strip()
+    return out + [current] if current or not out else out
+
+
 def print_side_by_side(left_title, left, right_title, right):
-    """Two texts in two columns, each wrapped to half the terminal width."""
+    """Two texts in two columns, each wrapped to half the terminal width.
+    Measured in terminal columns, not characters (2026-10-12, answer 005268): the raw model wrote a Chinese
+    worksheet, its double-width characters made lines wider than the terminal, and the overflow ("te . |")
+    wrapped round under the harness's answer."""
     width = max(20, (shutil.get_terminal_size().columns - 3) // 2)
 
     def lines(text):
         out = []
         for line in text.strip().splitlines() or [""]:
-            out += textwrap.wrap(line, width) or [""]
+            out += wrap_columns(line, width)
         return out
 
-    print(style(left_title.ljust(width), "bold", "cyan") + " │ " + style(right_title, "bold", "yellow"))
+    def pad(text):
+        return text + " " * (width - sum(map(cells, text)))
+
+    print(style(pad(left_title), "bold", "cyan") + " │ " + style(right_title, "bold", "yellow"))
     print(" " * width + " │")
     for a, b in itertools.zip_longest(lines(left), lines(right), fillvalue=""):
-        print(f"{a.ljust(width)} │ {b}")
+        print(f"{pad(a)} │ {b}")
 
 
 STYLES = {"dim": "2", "bold": "1", "cyan": "36", "green": "32", "yellow": "33", "red": "31"}

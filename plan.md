@@ -1038,3 +1038,16 @@ messages ("The user said: ... My name is Jack Jackson. What is yours? ..."). Onl
 it is rechecked (the copy/general part ran on the same prompts and doesn't use memory_text).
 **Result: name found** - "Do you remember what my name is?" -> source chain -> "Yes, my name is Jack Jackson." (right
 fact, the reply says "my" for "your"). Kept: the user's message is always remembered; copies 0/26, general 18/22.
+
+### The source chain's memory step: your messages one per line (2026-10-12, trace 3e2cb3)
+"What is my name?" with "my name is JJ" in memory -> "you haven't told me": the memory step joined the messages into
+"The user said: my name is JJ can you tell me about yourself" and the evidence step found NONE. Probe on that text:
+joined NONE, quoted NONE, capitalised sentences NONE, one per line "my name is JJ". Now one per line ("- ...").
+Test (scratchpad, no web unless the chain goes there): the 8 memory questions of both evals + Jack (unkept) + JJ,
+through sources.answer, old vs new format.
+**Prediction:** new >= old, JJ fixed; the evals' memory questions mostly unchanged (they were 12/12 through the chain
+on 2026-10-10, with sampled answers).
+**Result: 10/10 both ways - kept (one per line).** In this run even the old joined format found "JJ": the step before,
+which writes what has to be found, worded it differently this time, and the evidence step then copied the name. So
+3e2cb3 was a borderline case, not a sure miss. On the exact failing input (same need) only one per line found the name
+(the probe above), so the new format is the safer one; nothing got worse. The Jack reply now says "your name".

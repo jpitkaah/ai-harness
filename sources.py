@@ -440,9 +440,11 @@ def memory_text(history):
     notes = [line for line in lines if not line.startswith(also)]
     said = [line[len(also):] for line in lines if line.startswith(also)]
     said += [exchange["user"] for exchange in history if not exchange.get("summary")]
+    # The user's messages one per line (2026-10-12, answer 3e2cb3): joined, "my name is JJ can you tell me about
+    # yourself" read as one run-on and the evidence step found no name; one per line it copied "my name is JJ".
     parts = (["Notes from the earlier conversation: " + " ".join(notes)] if notes else []) + \
-            (["The user said: " + " ".join(said)] if said else [])
-    return " ".join(parts) if parts else None
+            (["The user said:\n" + "\n".join(f"- {s}" for s in said)] if said else [])
+    return "\n".join(parts) if parts else None
 
 
 def chain_answer(prompt, history=()):
