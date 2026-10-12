@@ -1,0 +1,20 @@
+eval.py best (strat2 v14 = best_strat.py) on the full 26-question test, 3 tries each. 2026-10-09.
+Scorer at this point accepts: seven, young/recent/contemporary, nowhere/cannot be buried/only after death, 5:30pm fix.
+
+Running best ...
+  75/78 correct, 2 gave up, 1372s
+
+config       correct  gave up  avg attempts  seconds
+best        75/78           2          1.21     1372
+
+category           best
+facts            23/24 
+math             18/18 
+trick            10/12 
+instructions     12/12 
+memory           12/12 
+
+--- best failures ---
+  'What gas do plants absorb from the air?': '<gave up>'
+  "How many r's are in the word strawberry?": 'One r.'
+  'If a plane crashes on the border of two countries,': '<gave up>'

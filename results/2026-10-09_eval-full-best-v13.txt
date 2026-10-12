@@ -1,0 +1,26 @@
+eval.py best (strat2 v13 = best_strat.py) on the full 26-question test, 3 tries each. 2026-10-09.
+
+Running best ...
+  68/78 correct, 2 gave up, 1360s
+
+config       correct  gave up  avg attempts  seconds
+best        68/78           2          1.22     1360
+
+category           best
+facts            20/24 
+math             18/18 
+trick            11/12 
+instructions      8/12 
+memory           11/12 
+
+--- best failures ---
+  'What is the freezing point of water in Fahrenheit?': 'Zero degrees Fahrenheit.'
+  'What is the freezing point of water in Fahrenheit?': 'Zero.'
+  'What gas do plants absorb from the air?': '<gave up>'
+  'What gas do plants absorb from the air?': 'Oxygen, plants absorb oxygen from the air.'
+  'If a plane crashes on the border of two countries,': 'On the border.'
+  'Reply with only a number: how many days are in a w': 'Seven.'
+  'Reply with only a number: how many days are in a w': 'Seven.'
+  'Answer yes or no: is the Sun a star?': 'No.'
+  'What is the opposite of "ancient"? Answer in one w': 'Young.'
+  'What is my name?': '<gave up>'

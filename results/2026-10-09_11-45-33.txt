@@ -1,0 +1,129 @@
+Base model, failed question set: 10 questions x 3 tries = 30 answers.
+
+SUMMARY
+  strat1    15/30 correct, 1 gave up, 157s
+  strat2    10/30 correct, 3 gave up, 234s
+  strat3    10/30 correct, 4 gave up, 526s
+  strat4    16/30 correct, 0 gave up, 1533s
+
+PER QUESTION (each cell = correct answers out of 3 tries, - = not measured)
+  question                                                    strat1    strat2    strat3    strat4
+  What is 17 times 23?                                           3/3       3/3       2/3       2/3
+  A train leaves at 3 pm and travels for 2.5 hours. What         1/3       0/3       0/3       2/3
+  What is 15% of 200?                                            3/3       3/3       2/3       2/3
+  Which is heavier, a kilogram of feathers or a kilogram         0/3       0/3       0/3       0/3
+  How many r's are in the word strawberry?                       2/3       0/3       0/3       3/3
+  If a plane crashes on the border of two countries, wher        0/3       0/3       0/3       0/3
+  How many months have 28 days?                                  2/3       0/3       1/3       2/3
+  Answer yes or no: is the Sun a star?                           1/3       1/3       2/3       0/3
+  What is the opposite of "ancient"? Answer in one word.         0/3       0/3       0/3       3/3
+  What is my favourite colour now?                               3/3       3/3       3/3       2/3
+  TOTAL                                                        15/30     10/30     10/30     16/30
+
+WRONG ANSWERS: strat1 (15 of 30)
+  A train leaves at 3 pm and travels for 2.5 hours. What time does it arrive?
+     - <gave up>
+     - 6:30.
+  Which is heavier, a kilogram of feathers or a kilogram of steel?
+     - It depends on what you mean by heavier.
+     - A kilogram of steel is heavier.
+     - A kilogram of steel is heavier.
+  How many r's are in the word strawberry?
+     - There are two r's in the word strawberry.
+  If a plane crashes on the border of two countries, where do they bury the survivors?
+     - The plane crashes on the border of two countries, where do they bury the survivors?
+     - Survivors are buried in both countries.
+     - If a plane crashes on the border of two countries, they bury the survivors in the country where the plane made contact.
+  How many months have 28 days?
+     - How many months have 28 days?
+  Answer yes or no: is the Sun a star?
+     - The Sun is a star.
+     - Yes, the Sun is a star.
+  What is the opposite of "ancient"? Answer in one word.
+     - The word "ancient" means very old. Its opposite is very new.
+     - The opposite of ancient is recent.
+     - The answer is "modern".
+
+WRONG ANSWERS: strat2 (20 of 30)
+  A train leaves at 3 pm and travels for 2.5 hours. What time does it arrive?
+     - 1530
+     - Sure! The train arrives at 5.5 pm.
+     - 5.5 pm, the train arrives at 5:5 pm.
+  Which is heavier, a kilogram of feathers or a kilogram of steel?
+     - I would say a kilogram of steel.
+     - <gave up>
+     - A kilogram of steel is heavier.
+  How many r's are in the word strawberry?
+     - 4 r's are in the word "strawberry".
+     - <gave up>
+     - <gave up>
+  If a plane crashes on the border of two countries, where do they bury the survivors?
+     - The AI is not able to provide a definite answer to the question as it is not a legal or ethical issue.
+     - To answer the user's question, I will perform some background research on the topic of burying survivors of a plane crash on the border of two countries. Here's the step-by-step process:
+     - To answer your question, I need more information. Can you provide some details?
+  How many months have 28 days?
+     - In february of a, there are 28 days.
+     - There are 28 days in February, and that's the only month that has 28 days.
+     - 0.42857142857142855. There are 0.42857142857142855 months with exactly 28 days.
+  Answer yes or no: is the Sun a star?
+     - The Sun is a star. Yes.
+     - Sure! Let me check. Yes, the Sun is indeed a star. Stars are massive, luminous balls of plasma that produce light and heat through nuclear reactions, primarily fusing hydrogen into helium in their cores. The Sun is the closest star to Earth, and it is responsible for the majority of the energy that reaches our planet, including light and heat.
+  What is the opposite of "ancient"? Answer in one word.
+     - The opposite of "ancient" is "modern".
+     - Ancient is the opposite of [trans: ancient
+     - The opposite of "ancient" is "modern".
+
+WRONG ANSWERS: strat3 (20 of 30)
+  What is 17 times 23?
+     - <gave up>
+  A train leaves at 3 pm and travels for 2.5 hours. What time does it arrive?
+     - The train arrives at 6 pm.
+     - The arrival time is 6 pm.
+     - The train arrives at 6 pm.
+  What is 15% of 200?
+     - <gave up>
+  Which is heavier, a kilogram of feathers or a kilogram of steel?
+     - A kilogram of steel is heavier than a kilogram of feathers.
+     - A kilogram of steel is heavier than a kilogram of feathers.
+     - A kilogram of steel is heavier than a kilogram of feathers.
+  How many r's are in the word strawberry?
+     - There are 4 r's in the word strawberry.
+     - There are 2 r's in the word "strawberry".
+     - There are 2 r's in the word strawberry.
+  If a plane crashes on the border of two countries, where do they bury the survivors?
+     - In a plane crash on the border of two countries, the survivors would likely be transported to the nearest country's medical facilities or hospitals for immediate care. The burial of the survivors would be handled by the country where the survivors are located.
+     - Survivors of a plane crash on the border of two countries would be buried in a cemetery or a memorial site in the territory where the majority of the population resides.
+     - <gave up>
+  How many months have 28 days?
+     - <gave up>
+     - There are 7 months with 28 days: January, March, May, July, August, October, December.
+  Answer yes or no: is the Sun a star?
+     - Yes, the Sun is a star.
+  What is the opposite of "ancient"? Answer in one word.
+     - The opposite of "ancient" is "recent."
+     - The opposite of "ancient" is "modern".
+     - The opposite of "ancient" is "modern."
+
+WRONG ANSWERS: strat4 (14 of 30)
+  What is 17 times 23?
+     - To find the answer, we need to multiply 17 by 23. We can do this by multiplying 17 by 20 and then multiplying 17 by 3, and then adding the two results together.
+  A train leaves at 3 pm and travels for 2.5 hours. What time does it arrive?
+     - The train arrives at 6:30 PM.
+  What is 15% of 200?
+     - To find 15% of 200, you can use the formula: (percentage / 100) * total value. In this case, it would be (15 / 100) * 200.
+  Which is heavier, a kilogram of feathers or a kilogram of steel?
+     - A kilogram of steel is heavier than a kilogram of feathers, as steel is a denser material than feathers.
+     - A kilogram of steel is heavier than a kilogram of feathers. This is because steel has a higher density compared to feathers.
+     - The kilogram of steel is heavier than the kilogram of feathers, since it is made of a denser material.
+  If a plane crashes on the border of two countries, where do they bury the survivors?
+     - A plane crash on the border of two countries often results in legal and political complexities. However, in the event that survivors are rescued and need to be transported, they would typically be transferred to one of the countries that has a border with the crash site.
+     - If a plane crashes on the border of two countries, the survivors are usually taken to the nearest hospital or medical center, where they can receive medical care and be treated. They are then transported to the nearest airport or airfield for evacuation. The bodies of the deceased are usually buried in the country where the crash occurred, or if the plane is carrying passengers from multiple countries, they may be buried in a neutral location such as a cemetery or a designated burial site.
+     - The survivors are buried in the country they are a citizen of.
+  How many months have 28 days?
+     - There are 28 days in February in a common year.
+  Answer yes or no: is the Sun a star?
+     - Yes, the Sun is a star. It is a massive, luminous ball of plasma that generates energy through nuclear fusion reactions in its core. It is the closest star to Earth and provides the light and heat that sustains life on our planet.
+     - Yes, the Sun is a star. It is the closest star to Earth and is the central star of the Solar System.
+     - Yes, the Sun is a star. It is the closest star to Earth and is the most massive and luminous object in our solar system.
+  What is my favourite colour now?
+     - I'm sorry, but I don't know your favourite colour at the moment. Please tell me.

@@ -1,0 +1,105 @@
+Answers to the open questions in "Failure patterns: Qwen 2.5 3B harness on GPQA and IFBench" (2026-10-10)
+
+From the runs already made on 2026-10-10 (v17 = strat2.py = best_strat.py). No new test runs were made
+for these answers.
+
+
+1. Why does the probe with the current samples score 67 when v17's full run scored 75?
+
+Two reasons, both visible in the data.
+
+a) It is not the same computation. The full run lets the model write "The correct answer is (C)" one
+   token at a time. The probe puts "The correct answer is (" into the prompt and reads the next token's
+   probabilities. llama.cpp doesn't promise identical numbers for text read as part of a prompt (in a
+   batch) and text generated token by token. Many GPQA questions are near-ties: on the hard set the right
+   letter was a close second 10 times, 6 of them within 0.13 of the top letter. A tiny difference flips
+   such a question. Against v17's full run, the probe kept 65 of its 75 right answers and got 2 of its 123
+   wrong ones right: 67.
+
+b) The probe also moves between identical runs. The same three sample variants scored 71, 75 and 68 in
+   one run and 67, 73 and 66 in the next: up to 4 of 198. Both probe runs had the prompt cache on (see
+   question 3).
+
+So the probe is fine for relative questions, such as whether the letter bias comes from the samples (it
+doesn't). It is not a stand-in for the full run's score.
+
+
+2. Which route did each failing IFBench prompt take? Did prompts 44 and 197 hit the normal route's
+   100-token limit?
+
+Routes are not logged; suggestion 1 would log them. The router scores below were read again afterwards for
+the same prompts, one token each. A prompt takes the long route at 0.85 or more. On the normal route, the
+letters, comparison and math routers each take a prompt at 0.75 or more, and everything else goes through
+the sense check to the answer-key prompt.
+
+These are the failures of the run the dump came from (GPQA 1/30, IFBench 2/30):
+
+  Long route (20):  17 (0.93), 29 (0.89), 44 (0.92), 81 (0.93), 89 (0.87), 137 (0.88), 153 (0.91),
+                    168 (0.89), 176 (0.99), 181 (0.93), 188 (0.91), 191 (0.98), 216 (0.99), 228 (0.92),
+                    239 (0.90), 260 (0.94), 275 (0.93), 276 (0.95), 284 (0.88), 299 (0.95)
+  Normal route (8): 47 (0.67), 63 (0.84), 64 (0.30), 197 (0.83), 220 (0.82), 282 (0.79), 283 (0.17),
+                    and 61 (0.76), taken by the math router (0.80): "32000 connections."
+  The two that passed, 69 and 161, both took the long route.
+
+- Prompt 197: normal route, so yes. Its 71 words come from the normal route's limits: it stops at the
+  first sentence end after 50 tokens, and always at 100. The request asked for 89-99 words.
+- Prompt 44: long route (0.92), so the 100-token limit did not apply; the long route allows 1500. Its
+  reply ends on a full sentence at 64 words. The log doesn't show whether the model stopped by itself or
+  all three attempts were rejected and the last one was used.
+- Router scores move a little between runs (prompt 282: 0.78 and 0.79). Prompts near a bar (63 at 0.84,
+  197 at 0.83, 220 at 0.82) can take a different route on another run.
+
+
+3. Does cache_prompt: false remove the run-to-run noise on this backend?
+
+It reduces the noise but doesn't remove it. Same code (v17), each control set run twice back to back:
+
+                                             cache on    cache off
+  IFBench replies identical in both runs      15/30       24/30
+  IFBench prompts whose pass/fail flipped      3           1
+  IFBench control score (two runs)             24, 25      23, 22
+  GPQA replies identical in both runs         26/30       27/30
+  GPQA control score (two runs)                27, 28      28, 28
+
+With the cache on, results also depend on what ran just before: the same IFBench control set scored 20/30
+when the hard set had run first.
+- Tests now send cache_prompt false (harness.CACHE_PROMPT). The chat app keeps the cache, which is about
+  30% faster on IFBench.
+- What's left is about 1 flip per 30-item set, from the backend itself. It shows most on IFBench, where
+  one changed token changes the rest of a long answer.
+
+v17's reruns on the sets so far, as the baseline the document asks for:
+
+  run                                 cache   GPQA hard   GPQA control   IFBench hard   IFBench control
+  first check of the hard sets        on      0           -              1              -
+  after moving top_token_probs        on      1           -              -              -
+  small test, hard sets only          on      1           -              2              -
+  small test with control sets        on      0           28             2              20
+  control sets back to back           on      -           27, 28         -              24, 25
+  control sets back to back           off     -           28, 28         -              23, 22
+  small test (the reference now)      off     1           27             4              22
+
+
+4. Have DRY or other repetition penalties already been tried and logged in FAILED_EXPERIMENTS.md?
+
+No. Neither FAILED_EXPERIMENTS.md nor plan.md has an entry for DRY or for a repeat, frequency or
+presence penalty.
+- The only sampler trial: strat2 v4 (temperature 0.2 / 0.8 and min_p 0.1, 2026-10-09) scored 16/30
+  against 17/30, within the noise.
+- After that the user ruled out sampler changes. CLAUDE.md: "Never tune temperature or sampler settings
+  (min_p, top_k, ...) to change scores." DRY is a sampler setting, so it needs the user's OK before any
+  trial.
+
+What the harness does instead is its own repetition check:
+- A reply that repeats a 4-word phrase (normal route) or a 10-word phrase (long route) is cut off and
+  rejected, and the next attempt gets a note (harness.run_checks).
+- A reply cut this way is never accepted. It reaches the results only as the fallback: when all three
+  attempts are rejected, the last one is used (marked "unchecked" in the app).
+- So every truncated IFBench reply that ends on a repeated phrase is such a fallback.
+
+Does DRY act at temperature 0? Not tested here. In llama.cpp's sampler chain the penalties and DRY come
+before the temperature step, so they should still change which token is most likely. Unverified.
+
+Update (2026-10-10, after these answers): the user allows DRY. Their one rule for the harness is not to
+hard-code anything very specific that helps the code solve a certain test question. Test answers stay at
+temperature 0.

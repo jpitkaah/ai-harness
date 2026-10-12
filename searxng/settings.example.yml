@@ -1,0 +1,45 @@
+# SearXNG settings for this project: start from the defaults, change only what we need.
+use_default_settings: true
+
+server:
+  secret_key: "change-me"   # random, only used by this local instance
+  limiter: false           # local use only; the bot limiter would block our script
+
+search:
+  formats:                 # json is off by default; search.py needs it
+    - html
+    - json
+  # Rest a blocked engine longer before trying it again (seconds). The defaults (3 min;
+  # Qwant's CAPTCHA not at all - 57 CAPTCHAs in the log) kept hitting engines that had
+  # blocked us, which keeps them blocked. search.py moves on to the next engine meanwhile.
+  suspended_times:
+    SearxEngineAccessDenied: 86400     # "Access denied", HTTP 402/403: 1 day
+    SearxEngineCaptcha: 86400          # CAPTCHA: 1 day
+    SearxEngineTooManyRequests: 3600   # "Too many requests", HTTP 429: 1 hour
+
+# Spread the load over more engines, so no single one rate-limits us.
+# (2026-10-09: after ~100 test searches Brave and Google CSE answered "too many requests"
+# and DuckDuckGo a CAPTCHA, and SearXNG returned 0 results.)
+engines:
+  - name: bing
+    disabled: false
+  - name: google
+    disabled: false
+  - name: qwant
+    disabled: false
+  - name: mojeek
+    inactive: false
+  # 2026-10-09: more engines, because every SearXNG search asks ALL enabled engines at
+  # once - so all of them got blocked together. search.py now asks one engine per search.
+  - name: yahoo
+    disabled: false
+  - name: yandex
+    disabled: false
+  - name: mwmbl
+    disabled: false
+    inactive: false
+  - name: yep
+    disabled: false
+    inactive: false
+  - name: seznam
+    disabled: false

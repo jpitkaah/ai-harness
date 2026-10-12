@@ -1,0 +1,22 @@
+Full 26-question eval (78 answers per run), current scorer, 2026-10-09.
+After the 127.0.0.1 fix (runs take seconds instead of minutes), each setup was run several times.
+
+base raw      : 55, 56, 55                    -> average 55.3/78   (~81 s per run)
+base A        : 62, 58, 55                    -> average 58.3/78   (~20 s per run)
+v14 (best)    : 75*, 67, 74, 71, 72, 67       -> average 71.0/78   (~50 s per run)  range 67-75
+instruct raw  : 73*, 73, 74, 72               -> average 73.0/78   (~41 s per run)
+(* = run before the fix, same code, just slow)
+
+v14's spread comes mostly from give-ups (0-6 per run). The single 75/78 was a lucky high:
+on average v14 is ~13 above base A and ~2 below the instruct model with no harness.
+
+base raw = base model with no harness, through the same chat endpoint as instruct raw
+(the server applies Qwen's chat format; one call, reply as-is, 512-token safety cap).
+
+After the echo check (harness.check_reply rejects replies that only repeat the user's words):
+v14 (best) : 73, 73, 71, 72 -> average 72.3/78
+v15 (best) : 71, 72, 75, 70 -> average 72.0/78   (saved as best_strat.py: same score, fixes a chat bug)
+
+2026-10-10, answer_key v9 (chit-chat sentence + sample; best_strat's normal route) and "CO₂" in the plants keywords:
+best_strat (v15) : 75, 73, 73 -> average 73.7/78, 0 gave up in every run
+auto (app default: best_strat + look-ups, v13 chain, personal questions to the chain): 71, 75, 68, 75, 73 -> average 72.4/78

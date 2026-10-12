@@ -1,0 +1,24 @@
+Strategy v1 run (made with the old run_strats.py: no wrong-answer list). 11 questions x 5 tries = 55 answers.
+
+Running baseline ...
+  34/55 correct, 0 gave up, 262s
+Running strat1 ...
+  27/55 correct, 1 gave up, 275s
+Running strat2 ...
+  17/55 correct, 26 gave up, 734s
+Running strat3 ...
+  25/55 correct, 5 gave up, 1036s
+
+question                                                    baseline    strat1    strat2    strat3
+Name a mammal that can fly.                                      5/5       3/5       2/5       5/5
+What is 17 times 23?                                             4/5       4/5       4/5       5/5
+A train leaves at 3 pm and travels for 2.5 hours. What ti        5/5       2/5       2/5       0/5
+Which is heavier, a kilogram of feathers or a kilogram of        3/5       0/5       0/5       0/5
+How many r's are in the word strawberry?                         2/5       1/5       1/5       3/5
+If a plane crashes on the border of two countries, where         0/5       0/5       0/5       0/5
+How many months have 28 days?                                    4/5       2/5       0/5       2/5
+Answer yes or no: is the Sun a star?                             0/5       3/5       3/5       3/5
+What is the opposite of "ancient"? Answer in one word.           2/5       4/5       0/5       1/5
+What is my dog's name?                                           5/5       3/5       3/5       5/5
+What is my name?                                                 4/5       5/5       2/5       1/5
+TOTAL                                                          34/55     27/55     17/55     25/55

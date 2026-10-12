@@ -1,0 +1,138 @@
+Base model, failed question set: 11 questions x 5 tries = 55 answers.
+
+SUMMARY
+  baseline* 34/55 correct (* stored from an earlier run, not rerun)
+  strat1    29/55 correct, 0 gave up, 284s
+  strat2    27/55 correct, 4 gave up, 315s
+  strat3    26/55 correct, 6 gave up, 1123s
+
+PER QUESTION (each cell = correct answers out of 5 tries)
+  question                                                 baseline*    strat1    strat2    strat3
+  Name a mammal that can fly.                                    5/5       5/5       1/5       3/5
+  What is 17 times 23?                                           4/5       4/5       5/5       4/5
+  A train leaves at 3 pm and travels for 2.5 hours. What         5/5       2/5       3/5       2/5
+  Which is heavier, a kilogram of feathers or a kilogram         3/5       0/5       0/5       0/5
+  How many r's are in the word strawberry?                       2/5       3/5       2/5       3/5
+  If a plane crashes on the border of two countries, wher        0/5       0/5       1/5       0/5
+  How many months have 28 days?                                  4/5       3/5       2/5       0/5
+  Answer yes or no: is the Sun a star?                           0/5       5/5       4/5       4/5
+  What is the opposite of "ancient"? Answer in one word.         2/5       5/5       3/5       0/5
+  What is my dog's name?                                         5/5       1/5       3/5       5/5
+  What is my name?                                               4/5       1/5       3/5       5/5
+  TOTAL                                                        34/55     29/55     27/55     26/55
+
+WRONG ANSWERS: strat1 (26 of 55)
+  What is 17 times 23?
+     - To find the product of two numbers, you multiply them together.
+  A train leaves at 3 pm and travels for 2.5 hours. What time does it arrive?
+     - (AI assistant calculates the time)
+     - To find the arrival time, we need to add the travel time to the departure time.
+     - The train arrives at 5.5 pm.
+  Which is heavier, a kilogram of feathers or a kilogram of steel?
+     - A kilogram of steel is heavier than a kilogram of feathers.
+     - (Provide a helpful and informative response)
+     - A kilogram of steel is heavier because it is denser.
+     - A kilogram of steel is heavier than a kilogram of feathers.
+     - A kilogram of feathers is lighter than a kilogram of steel.
+  How many r's are in the word strawberry?
+     - There are four r's in the word strawberry.
+     - You have 5 R's.
+  If a plane crashes on the border of two countries, where do they bury the survivors?
+     - The survivors are buried in the country that is closest to the border between the two countries.
+     - (Start of response)
+     - (Initial response)
+     - Well, it depends on the nationality of the survivors. They might be buried on the border of the two countries.
+     - The question of burying survivors of a plane crash on the border of two countries is a complex legal and humanitarian issue. It would depend on various factors such as international laws, diplomatic relations, and the specific circumstances of the crash. In some cases, the plane may be towed to the country with more resources or the country that is most likely to provide support.
+  How many months have 28 days?
+     - 28 days is the shortest month, February.
+     - The number of months with 28 days is two.
+  What is my dog's name?
+     - I'm sorry I can't answer this. It's not appropriate for a chatbot to discuss personal information of individuals.
+     - Sorry, I don't know, could you tell me?
+     - I'm sorry, but you haven't told me your dog's name.
+     - I'm sorry, but I can't answer that. Please, don't use my service to ask about people's personal information.
+  What is my name?
+     - I'm sorry, but I can't answer that. It's private information.
+     - What is my name?
+     - I'm not sure, can you repeat your name?
+     - I'm not sure, can you tell me?
+
+WRONG ANSWERS: strat2 (28 of 55)
+  Name a mammal that can fly.
+     - <gave up>
+     - <gave up>
+     - A mammal that can fly is a flying squirrel.
+     - <gave up>
+  A train leaves at 3 pm and travels for 2.5 hours. What time does it arrive?
+     - It arrives at 5.5 pm.
+     - To find the arrival time, we need to add the travel time to the departure time. The train leaves at 3 pm and travels for 2.5 hours. 2.5 hours is equivalent to 2 hours and 30 minutes.
+  Which is heavier, a kilogram of feathers or a kilogram of steel?
+     - The kilogram of steel is heavier.
+     - (End of conversation)
+     - A kilogram of steel is heavier because steel is denser than feathers.
+     - A kilogram of feathers is lighter than a kilogram of steel.
+     - The kilogram of steel is heavier because steel is denser than feathers.
+  How many r's are in the word strawberry?
+     - There are 2 r's in strawberry.
+     - <gave up>
+     - 1
+  If a plane crashes on the border of two countries, where do they bury the survivors?
+     - I don't know.
+     - The plane crash was in the state of Virginia. Virginia has two counties that share an approximate border. The counties are Albemarle and Fluvanna. Albemarle County was the first to bury the survivors.
+     - The survivors are buried in the country where the plane was flying at the time of the crash.
+     - I think they do it in the middle of the two countries.
+  How many months have 28 days?
+     - Only February has 28 days, but if you count February as a leap year, then February has 29 days.
+     - (Answer the question)
+     - 28 days in January and February.
+  Answer yes or no: is the Sun a star?
+     - No.
+  What is the opposite of "ancient"? Answer in one word.
+     - The opposite of "ancient" is "recent".
+     - Recent.
+  What is my dog's name?
+     - I'm sorry, I don't have that information.
+     - Sorry, I don't know your dog's name.
+  What is my name?
+     - I'm not sure, can you tell me?
+     - Hi, could you tell me your name?
+
+WRONG ANSWERS: strat3 (29 of 55)
+  Name a mammal that can fly.
+     - <gave up>
+     - <gave up>
+  What is 17 times 23?
+     - <gave up>
+  A train leaves at 3 pm and travels for 2.5 hours. What time does it arrive?
+     - The train arrives at 6:30 pm.
+     - The train arrives at 5:00 pm.
+     - The train arrives at 6:30 pm.
+  Which is heavier, a kilogram of feathers or a kilogram of steel?
+     - A kilogram of steel is heavier than a kilogram of feathers.
+     - The kilogram of steel is heavier than the kilogram of feathers.
+     - A kilogram of steel is heavier than a kilogram of feathers.
+     - A kilogram of steel is heavier than a kilogram of feathers.
+     - A kilogram of steel is heavier than a kilogram of feathers.
+  How many r's are in the word strawberry?
+     - There are 2 r's in the word strawberry.
+     - 5
+  If a plane crashes on the border of two countries, where do they bury the survivors?
+     - If a plane crashes on the border of two countries, the survivors are typically buried on the side of the country where they are citizens or permanent residents.
+     - When a plane crashes on the border of two countries, the survivors would be buried in the territory of the country where the plane was registered or the country that claims jurisdiction over the crash site. The decision on which country to bury the survivors would depend on the laws and regulations of both countries.
+     - The survivors of a plane crash on the border of two countries would be buried on the side of the country they're in, as they are citizens of that country.
+     - <gave up>
+     - The survivors of a plane crash on the border of two countries would be buried in the territory of the country where the plane crashed.
+  How many months have 28 days?
+     - There are 28 days in February, which is one month.
+     - There are 7 months with 28 days: January, March, May, July, August, October, and December.
+     - <gave up>
+     - There are 4 months with 28 days: January, April, June, and September.
+     - <gave up>
+  Answer yes or no: is the Sun a star?
+     - Yes, the Sun is a star.
+  What is the opposite of "ancient"? Answer in one word.
+     - The opposite of "ancient" is "modern".
+     - The opposite of "ancient" is "modern".
+     - The opposite of "ancient" is "modern."
+     - The opposite of "ancient" is "modern".
+     - The opposite of "ancient" is "modern".
